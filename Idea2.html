@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deccan Campaign — Historical Simulation</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #0c0b09;
+  --surface:     #131210;
+  --surface2:    #1a1916;
+  --border:      rgba(200,169,110,0.12);
+  --border-mid:  rgba(200,169,110,0.25);
+  --gold:        #c8a96e;
+  --gold-dim:    rgba(200,169,110,0.08);
+  --gold-glow:   rgba(200,169,110,0.18);
+  --parchment:   #e8dfc8;
+  --muted:       #7a6f5c;
+  --faint:       #3a342a;
+  --green:       #5a9e72;
+  --green-dim:   rgba(90,158,114,0.13);
+  --red:         #b85555;
+  --red-dim:     rgba(184,85,85,0.13);
+  --r:           10px;
+  --rl:          16px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--parchment);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── GRAIN TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.4;
+}
+
+/* ── GLOBAL HEADER ── */
+#global-header {
+  position: relative; z-index: 10;
+  border-bottom: 1px solid var(--border);
+  padding: 1.1rem 2.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.header-progress {
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.gold-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.3;
+}
+
+/* ── STAGE (scene container) ── */
+#stage {
+  position: relative; z-index: 5;
+  flex: 1;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 3rem 1.5rem 2rem;
+}
+
+/* ── SCENE ENTRY ANIMATION ── */
+.scene-enter {
+  animation: sceneIn 0.7s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes sceneIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════
+   DECISION SCENE
+═══════════════════════════════════ */
+.decision-wrap {
+  width: 100%; max-width: 680px;
+}
+
+.scene-eyebrow {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+.act-tag {
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--border-mid);
+  padding: 3px 10px;
+  border-radius: 3px;
+}
+.role-tag {
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.scene-heading {
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  font-weight: normal;
+  color: var(--parchment);
+  line-height: 1.25;
+  margin-bottom: 0.3rem;
+}
+
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  opacity: 0.35;
+  margin: 1.1rem 0;
+}
+
+.narrative-text {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: #c4b99a;
+  margin-bottom: 1.1rem;
+}
+
+.role-immersion {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  border-left: 2px solid var(--gold);
+  padding: 0.4rem 0.85rem;
+  margin-bottom: 1.5rem;
+  background: var(--gold-dim);
+  border-radius: 0 var(--r) var(--r) 0;
+}
+
+.decision-question {
+  font-size: 0.78rem;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.85rem;
+}
+
+.options-grid {
+  display: flex; flex-direction: column; gap: 0.55rem;
+  margin-bottom: 1.4rem;
+}
+
+.opt-btn {
+  display: flex; align-items: flex-start; gap: 0.85rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--parchment);
+  font-family: 'Georgia', serif;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  padding: 0.85rem 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.opt-btn:hover:not(:disabled) {
+  background: rgba(200,169,110,0.06);
+  border-color: var(--border-mid);
+}
+.opt-btn:disabled { cursor: default; }
+
+.opt-key {
+  flex-shrink: 0;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--faint);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  transition: all 0.2s;
+  margin-top: 1px;
+}
+
+.opt-btn.state-correct {
+  background: var(--green-dim);
+  border-color: var(--green);
+  color: #8ecfa5;
+}
+.opt-btn.state-correct .opt-key {
+  background: var(--green); border-color: var(--green); color: #fff;
+}
+.opt-btn.state-incorrect {
+  background: var(--red-dim);
+  border-color: var(--red);
+  color: #c98585;
+}
+.opt-btn.state-incorrect .opt-key {
+  background: var(--red); border-color: var(--red); color: #fff;
+}
+.opt-btn.state-dim {
+  opacity: 0.38;
+}
+
+.feedback-box {
+  display: none;
+  border-radius: var(--r);
+  padding: 0.9rem 1.1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  line-height: 1.65;
+  animation: fadeIn 0.4s ease both;
+}
+.feedback-box.correct {
+  display: block;
+  background: var(--green-dim);
+  border: 1px solid rgba(90,158,114,0.3);
+  color: #8ecfa5;
+}
+.feedback-box.incorrect {
+  display: block;
+  background: var(--red-dim);
+  border: 1px solid rgba(184,85,85,0.3);
+  color: #c98585;
+}
+.feedback-verdict {
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+  font-weight: bold;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════
+   NARRATION SCENE
+═══════════════════════════════════ */
+.narration-wrap {
+  width: 100%; max-width: 720px;
+}
+
+.narration-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+.narration-act {
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.6rem;
+}
+.narration-title {
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+  font-weight: normal;
+  color: var(--parchment);
+  line-height: 1.2;
+}
+.narration-gold-line {
+  width: 80px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.4;
+  margin: 1rem auto 0;
+}
+
+.transcript-log {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 2rem;
+}
+
+.transcript-line {
+  font-size: clamp(0.95rem, 2.2vw, 1.12rem);
+  line-height: 1.85;
+  color: #c4b99a;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(200,169,110,0.06);
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  animation: lineIn 0.7s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes lineIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.line-index {
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  color: var(--faint);
+  flex-shrink: 0;
+  padding-top: 3px;
+  min-width: 1.6rem;
+  text-align: right;
+}
+.line-text { flex: 1; }
+
+.transcript-line.line-active .line-text::after {
+  content: '|';
+  animation: blink 0.9s step-end infinite;
+  color: var(--gold);
+  margin-left: 2px;
+  font-weight: bold;
+}
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+.narration-step-indicator {
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-align: center;
+  letter-spacing: 0.1em;
+  min-height: 1.2rem;
+}
+
+/* ── NEXT BUTTON ── */
+.next-btn-wrap {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1.5rem;
+}
+
+.next-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--r);
+  color: var(--gold);
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.65rem 1.3rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.next-btn:hover {
+  background: var(--gold-glow);
+  border-color: var(--gold);
+}
+.next-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.next-arrow {
+  font-size: 0.8rem;
+}
+
+/* ── END CARD ── */
+.end-card {
+  width: 100%; max-width: 520px;
+  text-align: center;
+}
+.end-seal {
+  width: 60px; height: 60px;
+  border: 1px solid var(--border-mid);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 1.5rem;
+}
+.end-title {
+  font-size: 1.4rem;
+  color: var(--gold);
+  margin-bottom: 0.6rem;
+}
+.end-sub {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+/* ── SCENE FOOTER ── */
+.scene-footer {
+  position: relative; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 2.5rem 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.footer-meta {
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  color: var(--faint);
+  letter-spacing: 0.1em;
+}
+.scene-dots {
+  display: flex; gap: 6px;
+}
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--faint);
+  transition: background 0.3s;
+}
+.dot.active { background: var(--gold); }
+.dot.done   { background: var(--muted); }
+</style>
+</head>
+<body>
+
+<div id="global-header">
+  <div class="header-title">Deccan Campaign · 1665 CE</div>
+  <div class="header-progress" id="header-progress">Scene 1 of 5</div>
+</div>
+<div class="gold-line"></div>
+
+<div id="stage"></div>
+
+<footer class="scene-footer">
+  <div class="footer-meta" id="footer-meta">Historical simulation</div>
+  <div class="scene-dots" id="scene-dots"></div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════
+   SCENE DATA
+═══════════════════════════════════════════ */
+const SCENES = [
+  {
+    type: "narration",
+    act: "ACT I",
+    title: "The Emperor's Order",
+    footer: "January 1665 · Mughal Court, Agra",
+    narration: [
+      "Aurangzeb, Emperor of Hindustan, grows weary of Shivaji's raids across the Deccan.",
+      "In December 1664, he summons Mirza Raja Jai Singh II — his most capable general.",
+      "The command is absolute: break Shivaji, reduce his forts, and end the Maratha threat.",
+      "Jai Singh departs Agra in the bitter cold of January 1665 with a vast imperial army.",
+      "He crosses the Narmada river on the 9th — the threshold between north and south."
+    ]
+  },
+  {
+    type: "decision",
+    act: "ACT I — Scene 2",
+    title: "The Approach",
+    role: "You are Jai Singh II, Mirza Raja of Amber",
+    narrative: "Your column has crossed the Narmada. The Deccan plateau opens before you. Shivaji's network of hill forts stretches from Pune to the Konkan coast. Your cavalry is strong, your artillery slow. The monsoon is four months away — time is your most precious resource.",
+    question: "How do you approach the Maratha heartland?",
+    footer: "February 1665 · Northern Deccan",
+    options: [
+      {
+        text: "March directly on Rajgad — Shivaji's capital. A swift strike at the heart.",
+        correct: false,
+        explanation: "Rajgad sits atop a near-vertical escarpment. A direct assault without reducing surrounding forts exposes your supply lines to Maratha raids. This ended historical sieges in failure."
+      },
+      {
+        text: "Secure Pune first, then establish a base at Saswad to control the plains.",
+        correct: true,
+        explanation: "Saswad commands the Bhima plain with open ground for Mughal cavalry. From here, Jai Singh isolated forts one by one. This is exactly the strategy he executed — it forced Shivaji to negotiate."
+      },
+      {
+        text: "Move south into Konkan and cut Shivaji's coastal trade routes.",
+        correct: false,
+        explanation: "The Konkan's dense jungle and monsoon gorges neutralise cavalry entirely. Maratha infantry and guerrillas own that terrain. Historically, Mughal columns there were ground down to nothing."
+      },
+      {
+        text: "Divide the army into three columns for simultaneous pressure.",
+        correct: false,
+        explanation: "Dividing in hostile terrain against an enemy with interior lines is fatal. Each column becomes small enough for Shivaji to destroy in detail before they can converge."
+      }
+    ]
+  },
+  {
+    type: "narration",
+    act: "ACT II",
+    title: "The Siege of Purandar",
+    footer: "March–June 1665 · Purandar Fort",
+    narration: [
+      "Jai Singh establishes his base at Saswad. The Mughal camp stretches for miles across the plateau.",
+      "He methodically reduces outlying Maratha posts, cutting Purandar's supply lines.",
+      "Shivaji watches from Rajgad as fort after fort falls to Mughal pressure and bribery.",
+      "By April, Jai Singh's guns are positioned on Vajragad — the lower hill commanding Purandar.",
+      "The bombardment begins. Stone by stone, the walls of Purandar begin to crack.",
+      "Shivaji's finest commander, Murar Baji, dies defending the breach. The fort cannot hold."
+    ]
+  },
+  {
+    type: "decision",
+    act: "ACT II — Scene 4",
+    title: "The Treaty Offer",
+    role: "You are Shivaji Bhonsle, Chhatrapati of the Marathas",
+    narrative: "Purandar is days from falling. Twenty-three of your thirty-five forts have been taken or threatened. Jai Singh sends an envoy — a remarkably generous offer. He speaks of service to the Emperor, of honour preserved, of forts returned after a northern campaign. Your sardars urge resistance to the last man. But you are not a man who fights to die.",
+    question: "Do you accept Jai Singh's terms at Purandar?",
+    footer: "June 1665 · Rajgad",
+    options: [
+      {
+        text: "Accept the treaty. Cede 23 forts, agree to serve the Emperor, preserve your core.",
+        correct: true,
+        explanation: "Shivaji signed the Treaty of Purandar on 11 June 1665. He ceded 23 forts but retained 12 key ones — including Rajgad. He lived to reclaim everything. Strategic retreat is not defeat."
+      },
+      {
+        text: "Reject the treaty and fight. Let the Marathas bleed the Mughals across every hill.",
+        correct: false,
+        explanation: "Historically suicidal. Without Purandar, the remaining forts fall in months. The Maratha confederacy fractures without a centre. Shivaji's genius was knowing when to yield in order to survive."
+      },
+      {
+        text: "Accept terms publicly, then sabotage Mughal operations from within.",
+        correct: false,
+        explanation: "Jai Singh was not naive. Shivaji would be expected at Agra — surrounded by imperial court and Mughal power. Treachery at this stage would mean imprisonment or death before any sabotage could begin."
+      }
+    ]
+  },
+  {
+    type: "narration",
+    act: "ACT III",
+    title: "Aftermath",
+    footer: "1665–1674 · The Long Game",
+    narration: [
+      "The Treaty of Purandar is signed. Shivaji yields 23 forts and a tribute of 400,000 rupees.",
+      "He travels to Agra in 1666 — and famously escapes Aurangzeb's court in a fruit basket.",
+      "By 1670, Shivaji recaptures all his lost forts in a single swift campaign.",
+      "In 1674, he crowns himself Chhatrapati — sovereign king — at Raigad.",
+      "What looked like defeat at Purandar was merely an intermission. The Marathas endured for 150 years more."
+    ]
+  }
+];
+
+/* ═══════════════════════════════════════════
+   ENGINE
+═══════════════════════════════════════════ */
+let currentScene = 0;
+let narrationTimer = null;
+let narrationStep = 0;
+let decisionMade = false;
+
+function buildDots() {
+  const wrap = document.getElementById('scene-dots');
+  wrap.innerHTML = '';
+  SCENES.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === currentScene ? ' active' : (i < currentScene ? ' done' : ''));
+    wrap.appendChild(d);
+  });
+}
+
+function updateHeader() {
+  document.getElementById('header-progress').textContent =
+    `Scene ${currentScene + 1} of ${SCENES.length}`;
+}
+
+function renderScene(scene) {
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '';
+  document.getElementById('footer-meta').textContent = scene.footer || '';
+  buildDots();
+  updateHeader();
+  decisionMade = false;
+  narrationStep = 0;
+  clearTimeout(narrationTimer);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'scene-enter';
+
+  if (scene.type === 'decision') {
+    wrap.appendChild(buildDecisionScene(scene));
+  } else if (scene.type === 'narration') {
+    const { el, start } = buildNarrationScene(scene);
+    wrap.appendChild(el);
+    stage.appendChild(wrap);
+    start();
+    return;
+  }
+
+  stage.appendChild(wrap);
+}
+
+/* ── DECISION RENDERER ── */
+function buildDecisionScene(s) {
+  const root = document.createElement('div');
+  root.className = 'decision-wrap';
+
+  root.innerHTML = `
+    <div class="scene-eyebrow">
+      <span class="act-tag">${s.act}</span>
+      <span class="role-tag">${s.role}</span>
+    </div>
+    <h1 class="scene-heading">${s.title}</h1>
+    <div class="gold-divider"></div>
+    <p class="narrative-text">${s.narrative}</p>
+    <div class="role-immersion">${s.role}</div>
+    <p class="decision-question">${s.question}</p>
+    <div class="options-grid" id="opts"></div>
+    <div class="feedback-box" id="feedback-box">
+      <div class="feedback-verdict" id="feedback-verdict"></div>
+      <div id="feedback-text"></div>
+    </div>
+    <div class="next-btn-wrap">
+      <button class="next-btn" id="next-btn" disabled>
+        Continue <span class="next-arrow">&#8594;</span>
+      </button>
+    </div>
+  `;
+
+  const opts = root.querySelector('#opts');
+  const keys = ['A','B','C','D'];
+  s.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="opt-key">${keys[i]}</span><span>${opt.text}</span>`;
+    btn.addEventListener('click', () => handleDecision(i, s, root));
+    opts.appendChild(btn);
+  });
+
+  return root;
+}
+
+function handleDecision(index, s, root) {
+  if (decisionMade) return;
+  decisionMade = true;
+
+  const chosen = s.options[index];
+  const btns = root.querySelectorAll('.opt-btn');
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    if (i === index) {
+      b.classList.add(chosen.correct ? 'state-correct' : 'state-incorrect');
+    } else {
+      b.classList.add('state-dim');
+    }
+  });
+
+  const box = root.querySelector('#feedback-box');
+  const verdict = root.querySelector('#feedback-verdict');
+  const text = root.querySelector('#feedback-text');
+  verdict.textContent = chosen.correct ? '✓  Correct stratagem' : '✗  Poor judgment';
+  text.textContent = chosen.explanation;
+  box.className = 'feedback-box ' + (chosen.correct ? 'correct' : 'incorrect');
+
+  root.querySelector('#next-btn').disabled = false;
+  root.querySelector('#next-btn').addEventListener('click', advanceScene);
+
+  window.dispatchEvent(new CustomEvent('history:decision', {
+    detail: {
+      act: s.act,
+      role: s.role,
+      choice: s.options[index].text,
+      correct: chosen.correct
+    }
+  }));
+}
+
+/* ── NARRATION RENDERER ── */
+function buildNarrationScene(s) {
+  const root = document.createElement('div');
+  root.className = 'narration-wrap';
+
+  root.innerHTML = `
+    <div class="narration-header">
+      <div class="narration-act">${s.act}</div>
+      <h1 class="narration-title">${s.title}</h1>
+      <div class="narration-gold-line"></div>
+    </div>
+    <div class="transcript-log" id="transcript-log"></div>
+    <div class="narration-step-indicator" id="step-indicator">&#8203;</div>
+    <div class="next-btn-wrap">
+      <button class="next-btn" id="next-btn" disabled>
+        Continue <span class="next-arrow">&#8594;</span>
+      </button>
+    </div>
+  `;
+
+  function start() {
+    const log = root.querySelector('#transcript-log');
+    const indicator = root.querySelector('#step-indicator');
+    const nextBtn = root.querySelector('#next-btn');
+    const lines = s.narration;
+    let step = 0;
+
+    function showLine() {
+      if (step >= lines.length) {
+        indicator.textContent = '';
+        nextBtn.disabled = false;
+        nextBtn.addEventListener('click', advanceScene);
+        return;
+      }
+      const prev = log.querySelector('.line-active');
+      if (prev) prev.classList.remove('line-active');
+
+      const row = document.createElement('div');
+      row.className = 'transcript-line line-active';
+      row.innerHTML = `<span class="line-index">${String(step + 1).padStart(2,'0')}</span><span class="line-text">${lines[step]}</span>`;
+      log.appendChild(row);
+
+      indicator.textContent = `${step + 1} / ${lines.length}`;
+
+      window.dispatchEvent(new CustomEvent('history:narration', {
+        detail: { step, text: lines[step] }
+      }));
+
+      step++;
+      narrationTimer = setTimeout(showLine, step === 1 ? 1400 : 1700);
+    }
+
+    setTimeout(showLine, 400);
+  }
+
+  return { el: root, start };
+}
+
+/* ── ADVANCE ── */
+function advanceScene() {
+  clearTimeout(narrationTimer);
+  currentScene++;
+  if (currentScene >= SCENES.length) {
+    renderEnd();
+    return;
+  }
+  renderScene(SCENES[currentScene]);
+}
+
+function renderEnd() {
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '';
+  document.getElementById('footer-meta').textContent = 'Simulation complete';
+  buildDots();
+  updateHeader();
+
+  const wrap = document.createElement('div');
+  wrap.className = 'scene-enter';
+  wrap.innerHTML = `
+    <div class="end-card">
+      <div class="end-seal">&#9670;</div>
+      <h2 class="end-title">Campaign Complete</h2>
+      <div class="gold-divider" style="width:80px;margin:1rem auto;"></div>
+      <p class="narrative-text" style="font-size:0.95rem;">
+        The Deccan Campaign of 1665 reshaped the subcontinent. Jai Singh's mastery of political pressure over brute force, and Shivaji's willingness to yield tactically while preserving his strategic core — both stand as lessons in statecraft that endure.
+      </p>
+      <p class="end-sub" style="margin-top:1.5rem;">1665 – 1674 · Deccan Plateau</p>
+    </div>
+  `;
+  stage.appendChild(wrap);
+}
+
+/* ── INIT ── */
+renderScene(SCENES[currentScene]);
+
+window.addEventListener('history:decision', e => console.log('[history:decision]', e.detail));
+window.addEventListener('history:narration', e => console.log('[history:narration]', e.detail));
+</script>
+</body>
+</html>
