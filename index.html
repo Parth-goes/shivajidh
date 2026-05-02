@@ -1,44 +1,181 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="styles.css">
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Great Escape from Agra</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── SOUND GATE OVERLAY ── */
+    #sound-gate {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 11, 9, 0.96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(6px);
+      transition: opacity 0.6s ease;
+    }
+
+    #sound-gate.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .gate-box {
+      text-align: center;
+      border: 1px solid rgba(200, 169, 110, 0.25);
+      border-radius: 12px;
+      padding: 2.5rem 3rem;
+      max-width: 360px;
+      background: #131210;
+      box-shadow: 0 0 60px rgba(200, 169, 110, 0.07);
+    }
+
+    .gate-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .gate-title {
+      font-family: 'Georgia', serif;
+      font-size: 1.1rem;
+      color: #e8dfc8;
+      margin-bottom: 0.5rem;
+      font-weight: normal;
+    }
+
+    .gate-sub {
+      font-family: 'Courier New', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      color: #7a6f5c;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .gate-btn-allow {
+      display: block;
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: 1px solid rgba(200, 169, 110, 0.5);
+      border-radius: 8px;
+      color: #c8a96e;
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-bottom: 0.75rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .gate-btn-allow:hover {
+      background: rgba(200, 169, 110, 0.08);
+      border-color: #c8a96e;
+    }
+
+    .gate-btn-skip {
+      display: block;
+      width: 100%;
+      padding: 0.6rem;
+      background: transparent;
+      border: none;
+      color: #3a342a;
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .gate-btn-skip:hover {
+      color: #7a6f5c;
+    }
+  </style>
 </head>
 <body>
 
-<div class="landing">
+<!-- SOUND GATE: shown before anything else, guarantees gesture context -->
+<div id="sound-gate">
+  <div class="gate-box">
+    <div class="gate-icon">♪</div>
+    <h2 class="gate-title">This experience includes music</h2>
+    <p class="gate-sub">Enable background audio<br>for the full experience</p>
+    <button class="gate-btn-allow" onclick="allowSound()">
+      ♪ &nbsp; Allow Sound
+    </button>
+    <button class="gate-btn-skip" onclick="skipSound()">
+      Continue without sound
+    </button>
+  </div>
+</div>
 
-  <!-- Background -->
+<audio id="bg-audio" loop preload="auto">
+  <source src="tutari.mp3" type="audio/mpeg">
+  <source src="tutari.ogg" type="audio/ogg">
+</audio>
+
+<div class="landing">
   <div class="bg"></div>
   <div class="overlay"></div>
-
-  <!-- Content -->
   <div class="content">
     <p class="eyebrow">A Digital Humanities Project</p>
-
     <h1 class="title">आग्र्यातून सुटका</h1>
-
     <div class="divider"></div>
-
     <p class="subtitle">
       From the Treaty of Purandar to the daring escape from Agra —
       a story of strategy, power, and defiance.
     </p>
-
     <button class="enter-btn" onclick="enterStory()">
       Enter the Story
     </button>
   </div>
-
 </div>
 
 <script>
-function enterStory() {
-  window.location.href = "Idea2.html"; // change to your first page
-}
+  const audio = document.getElementById('bg-audio');
+  const gate  = document.getElementById('sound-gate');
+
+  function dismissGate() {
+    gate.classList.add('fade-out');
+    // Remove from DOM after fade completes
+    setTimeout(() => gate.remove(), 650);
+  }
+
+  function allowSound() {
+    // Direct click handler — browser MUST allow this, no exceptions
+    audio.volume = 0;
+    audio.play().then(() => {
+      // Fade in over ~1.5s
+      const interval = setInterval(() => {
+        if (audio.volume + 0.05 >= 1) {
+          audio.volume = 1;
+          clearInterval(interval);
+        } else {
+          audio.volume += 0.05;
+        }
+      }, 75);
+    }).catch(err => console.error('Audio error:', err));
+
+    sessionStorage.setItem('audioUnlocked', 'true');
+    dismissGate();
+  }
+
+  function skipSound() {
+    // User opted out — respect it for the whole session
+    sessionStorage.setItem('audioUnlocked', 'false');
+    dismissGate();
+  }
+
+  function enterStory() {
+    window.location.href = "Idea2.html";
+  }
 </script>
 
 </body>
