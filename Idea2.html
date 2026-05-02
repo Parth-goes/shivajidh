@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="style.css">
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -435,6 +435,11 @@ function buildDecisionScene(s) {
       <div class="feedback-verdict" id="feedback-verdict"></div>
       <div id="feedback-text"></div>
     </div>
+    <div class="before-btn-wrap">
+      <button class="before-btn" id="before-btn" disabled>
+        Previous <span class="before-arrow">&#8592;</span>
+      </button>
+    </div>
     <div class="next-btn-wrap">
       <button class="next-btn" id="next-btn" disabled>
         Continue <span class="next-arrow">&#8594;</span>
@@ -479,7 +484,8 @@ function handleDecision(index, s, root) {
 
   root.querySelector('#next-btn').disabled = false;
   root.querySelector('#next-btn').addEventListener('click', advanceScene);
-
+  root.querySelector('#before-btn').disabled = false;
+  root.querySelector('#before-btn').addEventListener('click', beforeScene);
   window.dispatchEvent(new CustomEvent('history:decision', {
     detail: {
       act: s.act,
@@ -503,6 +509,11 @@ function buildNarrationScene(s) {
     </div>
     <div class="transcript-log" id="transcript-log"></div>
     <div class="narration-step-indicator" id="step-indicator">&#8203;</div>
+    <div class="before-btn-wrap">
+      <button class="before-btn" id="before-btn" disabled>
+        Previous <span class="before-arrow">&#8592;</span>
+      </button>
+    </div>
     <div class="next-btn-wrap">
       <button class="next-btn" id="next-btn" disabled>
         Continue <span class="next-arrow">&#8594;</span>
@@ -514,6 +525,7 @@ function buildNarrationScene(s) {
     const log = root.querySelector('#transcript-log');
     const indicator = root.querySelector('#step-indicator');
     const nextBtn = root.querySelector('#next-btn');
+    const prevbtn = root.querySelector('#before-btn');
     const lines = s.narration;
     let step = 0;
 
@@ -521,7 +533,9 @@ function buildNarrationScene(s) {
       if (step >= lines.length) {
         indicator.textContent = '';
         nextBtn.disabled = false;
+        prevbtn.disabled = false;
         nextBtn.addEventListener('click', advanceScene);
+        prevbtn.addEventListener('click', beforeScene)
         return;
       }
       const prev = log.querySelector('.line-active');
@@ -558,6 +572,18 @@ function advanceScene() {
   }
   renderScene(SCENES[currentScene]);
 }
+
+function beforeScene() {
+  clearTimeout(narrationTimer);
+  currentScene--;
+  if (currentScene = 0) {
+    renderScene(SCENES[0]);
+    return;
+  }
+  renderScene(SCENES[currentScene]);
+}
+
+
 
 function renderEnd() {
   const stage = document.getElementById('stage');
