@@ -9,6 +9,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
 <body>
+<body>
+
+
+
 
 <div id="global-header">
   <div class="header-title">The Great Escape from Agra</div>
@@ -24,6 +28,11 @@
 </footer>
 
 <script>
+  // ADDED: resume bg audio if user allowed it on landing page
+if (sessionStorage.getItem('audioUnlocked') === 'true') {
+  const a = document.getElementById('bg-audio');
+  if (a) { a.volume = 1; a.play().catch(() => {}); }
+}
 /* ═══════════════════════════════════════════
    SCENE DATA
 ═══════════════════════════════════════════ */
@@ -33,6 +42,7 @@ const SCENES = [
     act: "ACT I",
     title: "The Emperor's Order",
     footer: "January 1665 · Mughal Court, Agra",
+    audio: "murmur.ogg",
     // ADDED: media panel — map showing Agra and the Deccan theatre
     media: {
       type: "image",
@@ -53,19 +63,7 @@ const SCENES = [
     act: "ACT I — Scene 2",
     title: "The Approach",
     role: "You are Jai Singh II, Mirza Raja of Amber",
-    // ADDED: map showing strategic positions
-    media: {
-      type: "map",
-      center: [18.0, 75.5],
-      zoom: 6,
-      markers: [
-        { lat: 17.3616, lng: 76.8200, label: "Bijapur Sultanate", icon: "🌙" },
-        { lat: 17.3850, lng: 78.4867, label: "Golkonda", icon: "💎" },
-        { lat: 18.5204, lng: 73.8567, label: "Pune — Maratha Core", icon: "🏔️" },
-        { lat: 18.3278, lng: 74.0569, label: "Saswad — Jai Singh's Base", icon: "⚔️" },
-        { lat: 16.7030, lng: 74.2433, label: "Kolhapur — Konkan Entry", icon: "🌊" },
-      ]
-    },
+   
     narrative: "Your column has crossed the Narmada. The Deccan plateau opens before you. Shivaji's network of hill forts stretches from Pune to the Konkan coast. Your cavalry is strong, your artillery slow. The monsoon is four months away — time is your most precious resource.",
     question: "How do you approach the Maratha heartland?",
     footer: "February 1665 · Northern Deccan",
@@ -94,11 +92,14 @@ const SCENES = [
   },
   /*Here, another map showing the Maratha empire, Golkondas and bijapur and the relative position of saswad where he set up his base later*/
   {
+    
     type: "narration",
     act: "ACT II",
     title: "The Western Ghats",
     footer: "March, 1665 · Sahyadri Ranges",
+    audio: "audio1.ogg",
     narration: [
+      
       "In Western Maharashtra with its heavy rainfall, campaigning is impossible during the monsoons. It was already 3rd March when Jai Singh reached Puna, and if he was to effect anything it must be done in the next three months. ",
       "The Western Ghats form a long towering wall running north to south along the western side of the Deccan. They have thrown off a number of short spurs eastwards, every two of which enclose a valley, the bed of some stream rolling east to join its sisters and form the mighty rivers of the south, the Godavari and the Krishna. ",
       "Towards the east the spurs end, the valleys widen out and merge in the vast plains of the kingdom of Bijapur and this is the cradle of the Maratha kingdom, open  and therefore vulnerable, on the east, it is almost impenetrable from the west on account of hills and jungles .",
@@ -157,6 +158,11 @@ const SCENES = [
     act: "ACT IV",
     title: "The Siege Begins",
     footer: "March - April, 1665 · Vajragad",
+    media: {
+      type: "image",
+      src: "vajra.webp",
+      alt:"An image showing Vajragad and Purandar in one frame",
+    },
     narration: [
       "Dilir Khan with his nephews and Afghan troops, Hari Bhan and Udai Bhan Gaur, entrenched between Purandar and Rudramal. In front of him were the chief of the artillery, Turktaz Khan, and the party sent by Jai Singh.",
       "Kirat Singh with the 3,000 troopers of the Rajah and a few other mansabdars made a stockade opposite the north gate of Purandar. On the right were the trenches of Rajah Narsingh Gaur, Karn Rathor, among others. Behind Purandar and facing its postern gate (khirfy) was the position of Daud Khan, Rajah Rai Singh, Md. Salih Tarkhan, among others. ",
@@ -212,6 +218,7 @@ options: [
     act: "ACT VI",
     title: "Storming of the Outworks of Purandhar",
     footer: "May, 1665 · Purandhar",
+     
     narration: [
       "When, in the course of May, the Mughal trenches reached the foot of the two White Towers, which had been dismantled by bombardment, the garrison began to throw down lighted naphtha oil, leather bags full of gunpowder, bombs and heavy stones which effectually stopped the further advance of the Mughals",
       "Jai Singh ordered a high wooden platform of logs and planks to be made, on which guns were to be mounted and parties of gunners and musketeers placed, to command the enemy's position.",
@@ -349,6 +356,7 @@ options: [
   act: "ACT XI",
   title: "The Route",
   footer: "August 1666 · Agra to the Deccan",
+  audio: "horse.ogg",
   // ADDED: escape route map
   media: {
     type: "map",
@@ -398,6 +406,7 @@ options: [
   act: "ACT XIII",
   title: "Homecoming",
   footer: "End of December, 1666 · Rajgarh",
+  audio: "tutari.ogg",
   narration: [
     "Towards the end of December 1666, Shivaji returned at last to Rajgad in the garb of a wandering ascetic. Led into Jijabai’s presence as an unknown Bairagi, he fell at her feet; only when he laid his head in her lap did the mother recognize the son she had feared lost.",
     
@@ -533,7 +542,69 @@ function mountMediaPanel(sceneIndex, containerEl) {
     panel.classList.add('media-panel-visible');
   });
 }
+/* ═══════════════════════════════════════════
+   SCENE AUDIO MANAGER
+   - Fades out bg music when scene has audio
+   - Fades back in when scene ends
+   - Preloads next scene's audio in background
+═══════════════════════════════════════════ */
+const bgAudio    = document.getElementById('bg-audio');
+const sceneAudio = new Audio();
+sceneAudio.preload = 'auto';
+let sceneAudioActive = false;
 
+function fadeVolume(audioEl, targetVol, duration = 1000) {
+  const steps    = 20;
+  const interval = duration / steps;
+  const delta    = (targetVol - audioEl.volume) / steps;
+  return new Promise(resolve => {
+    const t = setInterval(() => {
+      audioEl.volume = Math.min(1, Math.max(0, audioEl.volume + delta));
+      if ((delta > 0 && audioEl.volume >= targetVol) ||
+          (delta < 0 && audioEl.volume <= targetVol)) {
+        audioEl.volume = targetVol;
+        clearInterval(t);
+        resolve();
+      }
+    }, interval);
+  });
+}
+
+function startSceneAudio(src) {
+  sceneAudio.src = src;
+  sceneAudio.volume = 0;
+  sceneAudio.loop = true;
+  sceneAudio.play().catch(() => {});
+  sceneAudioActive = true;
+
+  // Fade bg music down, scene audio up simultaneously
+  if (bgAudio) fadeVolume(bgAudio, 0.15);
+  fadeVolume(sceneAudio, 1);
+}
+
+function stopSceneAudio() {
+  if (!sceneAudioActive) return;
+  sceneAudioActive = false;
+
+  // Fade scene audio out, bg music back up simultaneously
+  fadeVolume(sceneAudio, 0).then(() => {
+    sceneAudio.pause();
+    sceneAudio.src = '';
+  });
+  if (bgAudio) fadeVolume(bgAudio, 1);
+}
+
+// Preload next scene's audio while current scene plays
+function preloadSceneAudio(sceneIndex) {
+  if (sceneIndex >= SCENES.length) return;
+  const next = SCENES[sceneIndex];
+  if (next.audio) {
+    const preloader = new Audio();
+    preloader.preload = 'auto';
+    preloader.src = next.audio;
+    // Just touching .src is enough to trigger browser preload
+  }
+}
 /* ═══════════════════════════════════════════ */
 let currentScene = 0;
 let narrationTimer = null;
@@ -556,6 +627,10 @@ function updateHeader() {
 }
 
 function renderScene(scene) {
+  stopSceneAudio();
+  if (scene.audio) startSceneAudio(scene.audio);
+  preloadSceneAudio(currentScene + 1);
+
   const stage = document.getElementById('stage');
   stage.innerHTML = '';
   document.getElementById('footer-meta').textContent = scene.footer || '';
@@ -619,6 +694,7 @@ function buildDecisionScene(s) {
       <div class="feedback-verdict" id="feedback-verdict"></div>
       <div id="feedback-text"></div>
     </div>
+    <div class="parent_btn">
     <div class="before-btn-wrap">
       <button class="before-btn" id="before-btn" disabled>
         Previous <span class="before-arrow">&#8592;</span>
@@ -628,6 +704,7 @@ function buildDecisionScene(s) {
       <button class="next-btn" id="next-btn" disabled>
         Continue <span class="next-arrow">&#8594;</span>
       </button>
+    </div>
     </div>
   `;
 
@@ -760,7 +837,7 @@ function advanceScene() {
 function beforeScene() {
   clearTimeout(narrationTimer);
   currentScene--;
-  if (currentScene = 0) {
+  if (currentScene <= 1) {
     renderScene(SCENES[0]);
     return;
   }
@@ -784,7 +861,8 @@ function renderEnd() {
       <h2 class="end-title">Campaign Complete</h2>
       <div class="gold-divider" style="width:80px;margin:1rem auto;"></div>
       <p class="narrative-text" style="font-size:0.95rem;">
-        The Deccan Campaign of 1665 reshaped the subcontinent. Jai Singh's mastery of political pressure over brute force, and Shivaji's willingness to yield tactically while preserving his strategic core — both stand as lessons in statecraft that endure.
+        On the 6th of June, 1674, at Raigad, Shivaji was crowned Chhatrapati, transforming a defiant regional power into a sovereign kingdom. This coronation was far more than a ceremonial act, it legitimized Maratha rule, consolidated authority, and marked the emergence of a structured state capable of expansion and governance. For the Deccan, it signaled a decisive shift in power, as the Marathas moved from resistance to dominance, reshaping the political landscape of the region. For Aurangzeb, however, this moment represented a direct challenge to imperial supremacy, an assertion of kingship where only subordination was expected. His response would define the latter half of his reign, as he plunged deeper into the Deccan campaigns, draining Mughal resources and weakening the empire’s foundation. In elevating himself to the status of a crowned ruler, Shivaji not only secured his legacy but also set in motion forces that would ultimately contribute to the gradual decline of Mughal authority in India.
+
       </p>
       <p class="end-sub" style="margin-top:1.5rem;">1665 – 1674 · Deccan Plateau</p>
     </div>
