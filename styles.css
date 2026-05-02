@@ -246,8 +246,8 @@ body::before {
    NARRATION SCENE
 ═══════════════════════════════════ */
 .narration-wrap {
-  width: 100%; max-width: 720px; margin-left: auto;transform: translateX(50%);
-  
+  width: 100%; max-width: 720px;
+  /* MODIFIED: removed erroneous translateX(50%) that broke layout */
 }
 
 .narration-header {
@@ -450,3 +450,165 @@ body::before {
 }
 .dot.active { background: var(--gold); }
 .dot.done   { background: var(--muted); }
+
+/* ═══════════════════════════════════════════
+   ADDED: TWO-COLUMN SCENE LAYOUT
+═══════════════════════════════════════════ */
+
+/* ADDED: scene-layout overrides stage centering for two-col display */
+.scene-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ADDED: content panel takes remaining space */
+.content-panel {
+  flex: 1;
+  min-width: 0;
+  max-width: 680px;
+}
+
+/* ADDED: full-width when no media panel present */
+.content-panel-full {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════════
+   ADDED: MEDIA PANEL — left side
+═══════════════════════════════════════════ */
+
+.media-panel {
+  flex: 0 0 420px;
+  width: 420px;
+  /* ADDED: start invisible, fade in when .media-panel-visible is added */
+  opacity: 0;
+  transition: opacity 0.8s ease 0.2s;
+  position: relative;
+  top: 5rem;
+  border-radius: var(--rl);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow:
+    0 0 40px rgba(200,169,110,0.06),
+    inset 0 0 60px rgba(0,0,0,0.4);
+  min-height: 340px;
+}
+
+/* ADDED: fade-in trigger class */
+.media-panel-visible {
+  opacity: 1;
+}
+
+/* ── IMAGE MODE ── */
+/* ADDED */
+.media-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 340px;
+  object-fit: cover;
+  /* Cinematic dimming */
+  filter: brightness(0.75) contrast(1.05) sepia(0.15);
+  transition: filter 0.4s ease;
+  
+}
+
+.media-panel-visible .media-img {
+  filter: brightness(0.82) contrast(1.05) sepia(0.1);
+}
+
+/* ADDED: vignette overlay on images */
+.media-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
+  z-index: 2;
+ 
+}
+
+/* ── MAP MODE ── */
+/* ADDED */
+.media-map-container {
+  width: 100%;
+  height: 400px;
+  min-height: 340px;
+  z-index: 1;
+}
+
+/* ADDED: Leaflet map dark-theme overrides */
+.media-map-container .leaflet-tile-pane {
+  filter: brightness(0.85) saturate(0.6);
+}
+
+.media-map-container .leaflet-control-zoom {
+  border: 1px solid var(--border-mid) !important;
+  background: var(--surface2) !important;
+}
+.media-map-container .leaflet-control-zoom a {
+  background: var(--surface2) !important;
+  color: var(--gold) !important;
+  border-color: var(--border) !important;
+}
+
+/* ADDED: Custom marker styles */
+.map-marker-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+}
+
+.map-marker-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.8));
+}
+
+.map-marker-label {
+  background: rgba(12,11,9,0.85);
+  border: 1px solid var(--border-mid);
+  color: var(--parchment);
+  font-family: 'Courier New', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+/* ── RESPONSIVE: collapse to single column below 860px ── */
+/* ADDED */
+@media (max-width: 860px) {
+  .scene-layout {
+    flex-direction: column;
+  }
+  .media-panel {
+    flex: none;
+    width: 100%;
+    position: static;
+    min-height: 220px;
+  }
+  .media-map-container {
+    height: 220px;
+    min-height: 220px;
+  }
+  .media-img {
+    min-height: 220px;
+  }
+}
+
+/* ADDED: also fix stage to not use align-items: flex-start when in layout mode */
+#stage {
+  align-items: flex-start;
+}
