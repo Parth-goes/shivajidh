@@ -60,11 +60,11 @@ const SCENES = [
   },
   {
     type: "decision",
-    act: "ACT I — Scene 2",
+    act: "ACT I",
     title: "The Approach",
     role: "You are Jai Singh II, Mirza Raja of Amber",
    
-    narrative: "Your column has crossed the Narmada. The Deccan plateau opens before you. Shivaji's network of hill forts stretches from Pune to the Konkan coast. Your cavalry is strong, your artillery slow. The monsoon is four months away — time is your most precious resource.",
+    narrative: "Your column has crossed the Narmada. The Deccan plateau opens before you. Shivaji's network of hill forts stretches from Pune to the Konkan coast. Your cavalry is strong, your artillery slow. The monsoon is four months away hence, time is your most precious resource.",
     question: "How do you approach the Maratha heartland?",
     footer: "February 1665 · Northern Deccan",
     options: [
@@ -112,7 +112,6 @@ const SCENES = [
     act: "ACT III",
     title: "The Purandar Fort",
     footer: "1665 · Purandar Fort",
-    audio: "audio1.ogg",
     // ADDED: map showing Purandar geography
     media: {
       type: "map",
@@ -121,7 +120,7 @@ const SCENES = [
       markers: [
         { lat: 18.2667, lng: 73.9833, label: "Purandar Citadel (4,364 ft)", icon: "🏰" },
         { lat: 18.2720, lng: 74.0020, label: "Vajragarh (Rudramala)", icon: "⚔️" },
-        { lat: 18.3278, lng: 74.0569, label: "Saswad — Jai Singh's Camp", icon: "🏕️" },
+        { lat: 18.3278, lng: 74.0569, label: "Saswad: Jai Singh's Camp", icon: "🏕️" },
       ]
     },
     narration: [
@@ -138,7 +137,7 @@ const SCENES = [
     act: "ACT III",
     title: "The First Attack",
     role: "You are Jai Singh II, Mirza Raja of Amber",
-    narrative: "Before you rises Purandar — a formidable double fortress. Its upper citadel stands atop sheer precipices, nearly impossible to storm directly. Below it lies the machi, a sprawling fortified terrace housing the garrison. Yet to the east, along a narrow ridge, stands Vajragarh — a smaller but commanding fort overlooking Purandar’s most vital approaches. The geography is clear: whoever holds Vajragarh holds the key to Purandar. A direct assault would be costly, but time is limited and the monsoon approaches.",
+    narrative: "Before you rises Purandar, a formidable double fortress. Its upper citadel stands atop sheer precipices, nearly impossible to storm directly. Below it lies the machi, a sprawling fortified terrace housing the garrison. Yet to the east, along a narrow ridge, stands Vajragarh, a smaller but commanding fort overlooking Purandar’s most vital approaches. The geography is clear: whoever holds Vajragarh holds the key to Purandar. A direct assault would be costly, but time is limited and the monsoon approaches.",
     question: "Where do you attack first?",
     footer: "1665 · Saswad",
    options: [
@@ -177,7 +176,6 @@ const SCENES = [
     act: "ACT V",
     title: "Capture of Vajragarh",
     footer: "April, 1665 · Vajragad",
-    audio: "sword.ogg",
     narration: [
       "At midday, 13th April, Dilir Khan's division stormed the tower and drove the enemy into an enclosure behind it. ",
       "Next day, the victorious Mughals pushed on to the inner enclosure and tried to capture it by escalade. The garrison, oppressed by their fire, capitulated in the evening (14th April), left the fort, and were disarmed. But Jai Singh very wisely allowed them to return home in order to tempt the garrison of Purandar, by this example of leniency, to surrender instead of fighting to the last.",
@@ -190,10 +188,9 @@ const SCENES = [
     act: "ACT V",
     title: "Capture of Vajragarh",
     role: "You are Jai Singh II, Mirza Raja of Amber",
-    narrative: "Before you rises Purandar — a formidable double fortress. Its upper citadel stands atop sheer precipices, nearly impossible to storm directly. Below it lies the machi, a sprawling fortified terrace housing the garrison. Yet to the east, along a narrow ridge, stands Vajragarh — a smaller but commanding fort overlooking Purandar’s most vital approaches. The geography is clear: whoever holds Vajragarh holds the key to Purandar. A direct assault would be costly, but time is limited and the monsoon approaches.",
+    narrative: "Before you rises Purandar, a formidable double fortress. Its upper citadel stands atop sheer precipices, nearly impossible to storm directly. Below it lies the machi, a sprawling fortified terrace housing the garrison. Yet to the east, along a narrow ridge, stands Vajragarh, a smaller but commanding fort overlooking Purandar’s most vital approaches. The geography is clear: whoever holds Vajragarh holds the key to Purandar. A direct assault would be costly, but time is limited and the monsoon approaches.",
     question: "A key officer is failing in duty and spreading doubt about the siege. What do you do?",
     footer: "May, 1665 · Vajragarh",
-
 options: [
   {
     text: "Ignore his conduct and allow him to continue at his post.",
@@ -221,7 +218,7 @@ options: [
     act: "ACT VI",
     title: "Storming of the Outworks of Purandhar",
     footer: "May, 1665 · Purandhar",
-    audio: "cannon.ogg", 
+     
     narration: [
       "When, in the course of May, the Mughal trenches reached the foot of the two White Towers, which had been dismantled by bombardment, the garrison began to throw down lighted naphtha oil, leather bags full of gunpowder, bombs and heavy stones which effectually stopped the further advance of the Mughals",
       "Jai Singh ordered a high wooden platform of logs and planks to be made, on which guns were to be mounted and parties of gunners and musketeers placed, to command the enemy's position.",
@@ -276,13 +273,13 @@ options: [
   title: "After Purandar",
   footer: "June 1665 – January 1666",
   narration: [
-    "12 June 1665 — The Treaty is enforced; Purandar is surrendered, and Mughal forces take possession of the fort.",
-    "12 June 1665 — Thousands of Maratha troops and families evacuate the fort, while Mughal officers take control of remaining strongholds.",
-    "14–18 June 1665 — Shivaji returns to Rajgarh, while Sambhaji is sent to the Mughal camp to enter imperial service.",
-    "23 June 1665 — Aurangzeb ratifies the treaty at Delhi, formally accepting Shivaji’s submission.",
-    "September 1665 — Shivaji is restored to imperial favour and ceremonially receives Mughal honours in Jai Singh’s camp.",
-    "November 1665 – January 1666 — Shivaji joins Jai Singh in the Bijapur campaign, marking his transition from adversary to Mughal ally.",
-    "January 1666 — Shivaji attempts to capture Panhala but is repulsed after heavy losses, forcing a retreat to Vishalgarh."
+    "12 June 1665: The Treaty is enforced; Purandar is surrendered, and Mughal forces take possession of the fort.",
+    "12 June 1665: Thousands of Maratha troops and families evacuate the fort, while Mughal officers take control of remaining strongholds.",
+    "14–18 June 1665: Shivaji returns to Rajgarh, while Sambhaji is sent to the Mughal camp to enter imperial service.",
+    "23 June 1665: Aurangzeb ratifies the treaty at Delhi, formally accepting Shivaji’s submission.",
+    "September 1665: Shivaji is restored to imperial favour and ceremonially receives Mughal honours in Jai Singh’s camp.",
+    "November 1665: January 1666: Shivaji joins Jai Singh in the Bijapur campaign, marking his transition from adversary to Mughal ally.",
+    "January 1666: Shivaji attempts to capture Panhala but is repulsed after heavy losses, forcing a retreat to Vishalgarh."
   ]
 },
 {
@@ -290,7 +287,7 @@ options: [
   act: "ACT V",
   title: "The Journey to Agra",
   role: "You are Shivaji Bhonsle",
-  narrative: "The Treaty of Purandar has been signed, but a greater test lies ahead. Jai Singh urges you to visit Aurangzeb’s court at Agra. You have never bowed before any ruler, and your people distrust the Mughal Emperor. Yet, promises of favour, power, and opportunity lie before you. Your council is divided — and the decision is yours alone.",
+  narrative: "The Treaty of Purandar has been signed, but a greater test lies ahead. Jai Singh urges you to visit Aurangzeb’s court at Agra. You have never bowed before any ruler, and your people distrust the Mughal Emperor. Your council is divided and the decision is yours alone.",
   
   question: "Will you go to the Mughal Court at Agra?",
   
@@ -313,7 +310,7 @@ options: [
   title: "Agra: Humiliation and Captivity",
   footer: "May–August 1666 · Agra",
   narration: [
-    "12 May 1666 — Shivaji enters the Diwan-i-Am at Agra on Aurangzeb’s fiftieth lunar birthday, amid imperial splendor, expecting honour after Purandar and service in the Bijapur campaign.",
+    "12 May 1666: Shivaji enters the Diwan-i-Am at Agra on Aurangzeb’s fiftieth lunar birthday, amid imperial splendor, expecting honour after Purandar and service in the Bijapur campaign.",
     
     "Instead of receiving distinction, he is placed among third-rank nobles beside commanders of five thousand, a station he sees as a calculated public slight to his status and achievements.",
     
@@ -323,7 +320,7 @@ options: [
     
     "Aurangzeb soon places him under guarded residence in Jaipur House, with Ram Singh made responsible for his custody; Shivaji realizes he is no honoured ally, but effectively a prisoner.",
     
-    "Through Raghunath Pant Korde and other agents, Shivaji attempts diplomacy — offering aid in conquering Bijapur and Golkonda, and even seeking private audience with the Emperor — but each petition is evaded or denied.",
+    "Through Raghunath Pant Korde and other agents, Shivaji attempts diplomacy, offering aid in conquering Bijapur and Golkonda, and even seeking private audience with the Emperor. Alas, each petition is evaded or denied.",
     
     "He tries to win over influential nobles like Jafar Khan, but imperial suspicion only deepens; rumours of Shivaji’s cunning and past exploits make even private meetings impossible.",
     
@@ -331,7 +328,7 @@ options: [
     
     "For nearly three months Shivaji endures confinement, uncertainty, and growing danger, while outwardly submitting and inwardly studying every weakness in the system around him.",
     
-    "As diplomacy fails and surveillance tightens, the struggle changes in character: the contest is no longer for honour at court, but for survival — and the idea of escape begins to take shape."
+    "As diplomacy fails and surveillance tightens, the struggle changes in character, the contest is no longer for honour at court, but for survival and the idea of escape begins to take shape."
   ]
 
 },
@@ -340,7 +337,6 @@ options: [
   act: "ACT X",
   title: "Escape from Agra",
   footer: "August 1666 · Agra to the Deccan",
-  audio: "planning.mp3",
   narration: [
     "With every appeal for release rejected and surveillance growing tighter, Shivaji abandoned hope in diplomacy and quietly began preparing his escape while feigning illness and submission.",
     
