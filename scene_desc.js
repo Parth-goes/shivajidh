@@ -28,6 +28,7 @@ export const SCENES = [
     type: "decision",
     act: "ACT II",
     title: "The Approach",
+    deckMap: true,
     role: "You are Jai Singh II, Mirza Raja of Amber",
    
     narrative: "Your column has crossed the Narmada. The Deccan plateau opens before you. Shivaji's network of hill forts stretches from Pune to the Konkan coast. Your cavalry is strong, your artillery slow. The monsoon is four months away hence, time is your most precious resource.",
@@ -63,6 +64,7 @@ export const SCENES = [
     act: "ACT III",
     title: "The Western Ghats",
     footer: "March, 1665 · Sahyadri Ranges",
+    deckMap: true,
     audio: "audio1.ogg",
     narration: [
       
@@ -79,16 +81,7 @@ export const SCENES = [
     title: "The Purandar Fort",
     footer: "1665 · Purandar Fort",
     // ADDED: map showing Purandar geography
-    media: {
-      type: "map",
-      center: [18.2667, 73.9833],
-      zoom: 12,
-      markers: [
-        { lat: 18.2667, lng: 73.9833, label: "Purandar Citadel (4,364 ft)", icon: "🏰" },
-        { lat: 18.2720, lng: 74.0020, label: "Vajragarh (Rudramala)", icon: "⚔️" },
-        { lat: 18.3278, lng: 74.0569, label: "Saswad: Jai Singh's Camp", icon: "🏕️" },
-      ]
-    },
+    deckMap: true,
     narration: [
       "Six miles south of Saswad rises the stupendous mountain mass of Purandar, the highest point of which towers 4,364 feet above sea-level and more than 2,500 feet above the plain at its foot. It is really a double fort, with an independent and very strong sister enclosure, named Vajragarh. on a ridge running out east of it.",
       "The Western Ghats form a long towering wall running north to south along the western side of the Deccan. They have thrown off a number of short spurs eastwards, every two of which enclose a valley, the bed of some stream rolling east to join its sisters and form the mighty rivers of the south, the Godavari and the Krishna. ",
@@ -102,6 +95,7 @@ export const SCENES = [
     type: "decision",
     act: "ACT V",
     title: "The First Attack",
+    deckMap: true,
     role: "You are Jai Singh II, Mirza Raja of Amber",
     narrative: "Before you rises Purandar, a formidable double fortress. Its upper citadel stands atop sheer precipices, nearly impossible to storm directly. Below it lies the machi, a sprawling fortified terrace housing the garrison. Yet to the east, along a narrow ridge, stands Vajragarh, a smaller but commanding fort overlooking Purandar’s most vital approaches. The geography is clear: whoever holds Vajragarh holds the key to Purandar. A direct assault would be costly, but time is limited and the monsoon approaches.",
     question: "Where do you attack first?",
@@ -124,11 +118,7 @@ export const SCENES = [
     act: "ACT VI",
     title: "The Siege Begins",
     footer: "March - April, 1665 · Vajragad",
-    media: {
-      type: "image",
-      src: "vajra.webp",
-      alt:"An image showing Vajragad and Purandar in one frame",
-    },
+    deckMap: true,
     narration: [
       "Dilir Khan with his nephews and Afghan troops, Hari Bhan and Udai Bhan Gaur, entrenched between Purandar and Rudramal. In front of him were the chief of the artillery, Turktaz Khan, and the party sent by Jai Singh.",
       "Kirat Singh with the 3,000 troopers of the Rajah and a few other mansabdars made a stockade opposite the north gate of Purandar. On the right were the trenches of Rajah Narsingh Gaur, Karn Rathor, among others. Behind Purandar and facing its postern gate (khirfy) was the position of Daud Khan, Rajah Rai Singh, Md. Salih Tarkhan, among others. ",
@@ -141,6 +131,7 @@ export const SCENES = [
     type: "narration",
     act: "ACT VII",
     title: "Capture of Vajragarh",
+    deckMap: true,
     footer: "April, 1665 · Vajragad",
     narration: [
       "At midday, 13th April, Dilir Khan's division stormed the tower and drove the enemy into an enclosure behind it. ",
@@ -153,6 +144,7 @@ export const SCENES = [
     type: "decision",
     act: "ACT VIII",
     title: "Capture of Vajragarh",
+    deckMap: true,
     role: "You are Jai Singh II, Mirza Raja of Amber",
     narrative: "Before you rises Purandar, a formidable double fortress. Its upper citadel stands atop sheer precipices, nearly impossible to storm directly. Below it lies the machi, a sprawling fortified terrace housing the garrison. Yet to the east, along a narrow ridge, stands Vajragarh, a smaller but commanding fort overlooking Purandar’s most vital approaches. The geography is clear: whoever holds Vajragarh holds the key to Purandar. A direct assault would be costly, but time is limited and the monsoon approaches.",
     question: "A key officer is failing in duty and spreading doubt about the siege. What do you do?",
@@ -182,6 +174,7 @@ options: [
   {
     type: "narration",
     act: "ACT IX",
+    deckMap: true,
     title: "Storming of the Outworks of Purandhar",
     footer: "May, 1665 · Purandhar",
      
@@ -219,6 +212,7 @@ options: [
   type: "narration",
   act: "ACT XI",
   title: "The Treaty of Purandar",
+  deckMap: true,
   footer: "June 1665 · Purandar",
   narration: [
     "Shivaji agreed to cede 23 forts to the Mughal Empire, yielding an annual revenue of four lakh hun.",
@@ -237,6 +231,7 @@ options: [
   type: "narration",
   act: "ACT XII",
   title: "After Purandar",
+  deckMap: true,
   footer: "June 1665 – January 1666",
   narration: [
     "12 June 1665: The Treaty is enforced; Purandar is surrendered, and Mughal forces take possession of the fort.",
@@ -252,6 +247,7 @@ options: [
   type: "decision",
   act: "ACT XIII",
   title: "The Journey to Agra",
+  deckMap: true,
   role: "You are Shivaji Bhonsle",
   narrative: "The Treaty of Purandar has been signed, but a greater test lies ahead. Jai Singh urges you to visit Aurangzeb’s court at Agra. You have never bowed before any ruler, and your people distrust the Mughal Emperor. Your council is divided and the decision is yours alone.",
   
@@ -274,6 +270,7 @@ options: [
   type: "narration",
   act: "ACT XIV",
   title: "Agra: Humiliation and Captivity",
+  deckMap: true,
   footer: "May–August 1666 · Agra",
   narration: [
     "12 May 1666: Shivaji enters the Diwan-i-Am at Agra on Aurangzeb’s fiftieth lunar birthday, amid imperial splendor, expecting honour after Purandar and service in the Bijapur campaign.",
@@ -302,6 +299,7 @@ options: [
   type: "narration",
   act: "ACT XV",
   title: "Escape from Agra",
+  deckMap: true,
   footer: "August 1666 · Agra to the Deccan",
   narration: [
     "With every appeal for release rejected and surveillance growing tighter, Shivaji abandoned hope in diplomacy and quietly began preparing his escape while feigning illness and submission.",
@@ -324,20 +322,7 @@ options: [
   footer: "August 1666 · Agra to the Deccan",
   audio: "horse.ogg",
   // ADDED: escape route map
-  media: {
-    type: "map",
-    center: [23.0, 80.0],
-    zoom: 5,
-    markers: [
-      { lat: 27.1767, lng: 78.0081, label: "Agra — Escape begins", icon: "🚪" },
-      { lat: 27.4924, lng: 77.6737, label: "Mathura — Disguise adopted", icon: "🪔" },
-      { lat: 25.4358, lng: 81.8463, label: "Allahabad — Ganges crossing", icon: "🌊" },
-      { lat: 25.3176, lng: 82.9739, label: "Benares — Near capture", icon: "⚠️" },
-      { lat: 24.7955, lng: 84.9994, label: "Gaya — Pilgrim cover", icon: "🕌" },
-      { lat: 19.8135, lng: 85.8312, label: "Puri — Jagannath Temple", icon: "🛕" },
-      { lat: 18.5204, lng: 73.8567, label: "Rajgarh — Homecoming", icon: "🏠" },
-    ]
-  },
+  deckMap: true,
   narration: [
     "With consummate cunning Shiva threw his pursuers off the scent, by following a route exactly opposite to that which leads to Maharashtra. ",
     
@@ -355,6 +340,7 @@ options: [
   type: "narration",
   act: "ACT XVII",
   title: "The Route",
+  deckMap: true,
   footer: "August 1666 · Agra to the Deccan",
   narration: [
     "In one town they were arrested on suspicion by the faujdar Ali Quli, who had learnt of Shivaji's flight from a letter of his Court agent before he received the official intimation of it. A close examination of the prisoners was begun.",
@@ -370,6 +356,7 @@ options: [
 {
   type: "narration",
   act: "ACT XVIII",
+  deckMap: true,
   title: "Homecoming",
   footer: "End of December, 1666 · Rajgarh",
   audio: "tutari.ogg",
