@@ -470,6 +470,7 @@ body::before {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  justify-content: flex-start;
 }
 
 /* ADDED: content panel takes remaining space */
@@ -486,17 +487,16 @@ body::before {
 }
 
 /* ═══════════════════════════════════════════
-   ADDED: MEDIA PANEL — left side
+   MEDIA PANEL — left side
 ═══════════════════════════════════════════ */
 
 .media-panel {
-  flex: 0 0 420px;
-  width: 420px;
-  /* ADDED: start invisible, fade in when .media-panel-visible is added */
-  opacity: 0;
+  flex: 0 0 500px;
+  width: 500px;
+  opacity: 0.4;
   transition: opacity 0.8s ease 0.2s;
   position: relative;
-  top: 5rem;
+  top: 0;
   border-radius: var(--rl);
   overflow: hidden;
   border: 1px solid var(--border);
@@ -504,10 +504,15 @@ body::before {
   box-shadow:
     0 0 40px rgba(200,169,110,0.06),
     inset 0 0 60px rgba(0,0,0,0.4);
-  min-height: 340px;
+  min-height: 600px;
 }
 
-/* ADDED: fade-in trigger class */
+/* Empty placeholder state — no media for this scene */
+.media-panel-empty {
+  background: linear-gradient(160deg, var(--surface) 0%, var(--surface2) 100%);
+  border: 1px solid var(--border);
+}
+
 .media-panel-visible {
   opacity: 1;
 }
@@ -543,6 +548,14 @@ body::before {
 
 /* ── MAP MODE ── */
 /* ADDED */
+
+/* Add this to style.css */
+.mapHolder {
+  width: 100%;
+  height: 100%;
+  min-height: 600px; /* same as media-panel min-height */
+}
+
 .media-map-container {
   width: 100%;
   height: 500px;
@@ -612,9 +625,4 @@ body::before {
   .media-img {
     min-height: 220px;
   }
-}
-
-/* ADDED: also fix stage to not use align-items: flex-start when in layout mode */
-#stage {
-  align-items: flex-start;
 }
