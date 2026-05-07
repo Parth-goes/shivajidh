@@ -1,129 +1,123 @@
 import {getLayers} from './layerLibrary.js';
 
-
-//define the viewstate
+// ── View state ─────────────────────────────────────────────────────────────
 let viewState = {
-    longitude: 78.0081,
-    latitude: 27.1767,
-    zoom: 10,
-    pitch: 45,
-    bearing: 0
-  };
+  longitude: 78.0081,
+  latitude:  27.1767,
+  zoom:      10,
+  pitch:     45,
+  bearing:   0
+};
 
 const State = {
   currentTime: 0,
-  maxTime: 50,
+  maxTime:     50,
   activeScene: 'MARCH_ANIMATION'
 };
 
-// helper function to increse the timestamps
-function advanceTime() {
-  // Increase time by 10 units (days)
-  State.currentTime += 10;
+// ── DeckGL singleton — created lazily on first renderMapScene() call ────────
+let deckgl = null;
 
-  // Cap the time at the max limit
-  if (State.currentTime > State.maxTime) {
-    State.currentTime = State.maxTime;
+function initDeck() {
+  const container = document.getElementById('map_container');
+  if (!container) {
+    console.error('[map_script] #map_container not found — cannot init DeckGL');
+    return false;
   }
 
-  console.log(`Current Campaign Day: ${State.currentTime}`);
-  
-  // Re-render only when the button is pressed
-  renderCurrentState();
-}
-// Helper to render with current global values
-function renderCurrentState() {
-  renderScene(current_scene_id,  State.currentTime);
-}
+  deckgl = new deck.DeckGL({
+    container: 'map_container',
+    debug: true,
+    viewState,
+    controller: true,
+    mapStyle: 'https://tiles.stadiamaps.com/styles/stamen_terrain.json',
 
-// 1. Initialize DeckGL once
-const deckgl = new deck.DeckGL({
-  container: 'container',
-  debug: true,
-  viewState: viewState, 
-  controller: true,
-  mapStyle: 'https://tiles.stadiamaps.com/styles/stamen_terrain.json',
-  
-    // hide the non-required layers
     onLoad: () => {
       const map = deckgl.getMapboxMap();
       if (!map) return;
-      
       map.on('style.load', () => {
         const style = map.getStyle();
         if (!style || !style.layers) return;
-
         style.layers.forEach(layer => {
-          // Tactical check: hide roads, labels, and points of interest
           const isModern = ['road', 'label', 'poi', 'transit', 'structure'].some(
-              keyword => layer.id.toLowerCase().includes(keyword)
+            keyword => layer.id.toLowerCase().includes(keyword)
           );
-
-          if (isModern) {
-              map.setLayoutProperty(layer.id, 'visibility', 'none');
-          }
+          if (isModern) map.setLayoutProperty(layer.id, 'visibility', 'none');
         });
-        if (map.getSource('terrainSource')) {
-        }
-    });
+      });
     },
 
-    onViewStateChange: ({ viewState: nextViewState }) => {
-    viewState = nextViewState;
-    deckgl.setProps({ viewState });
-
-    const map = deckgl.getMapboxMap();
-    // Only sync if the map has finished its previous style/source transition
-    if (map && map.loaded()) { 
+    onViewStateChange: ({ viewState: next }) => {
+      viewState = next;
+      deckgl.setProps({ viewState });
+      const map = deckgl.getMapboxMap();
+      if (map && map.loaded()) {
         map.jumpTo({
-            center: [nextViewState.longitude, nextViewState.latitude],
-            zoom: nextViewState.zoom,
-            bearing: nextViewState.bearing,
-            pitch: nextViewState.pitch
+          center:  [next.longitude, next.latitude],
+          zoom:    next.zoom,
+          bearing: next.bearing,
+          pitch:   next.pitch
         });
+      }
     }
+  });
+
+  return true;
 }
-});
 
-function renderScene(sceneId,  currentTime) {
-  // 1. Define where the camera should go
-  const viewConfigs = {
-    'OVERVIEW_MAP': { longitude: 76.0, latitude: 22.0, zoom: 5, pitch: 0 },
-    'INTERACTIVE_PROGRESS': { longitude: 73.9, latitude: 18.2, zoom: 12, pitch: 45 },
-    'ACT-I': {longitude: 73.9, latitude: 18.2, zoom: 7, pitch: 30 },
-    'ACT-Is2': {longitude: 73.9, latitude: 18.2, zoom: 7, pitch: 30 },
-    'ACT-II': {longitude: 73.9, latitude: 18.7, zoom: 6, pitch: 45 },
-    'ACT-III': {longitude: 73.97, latitude: 18.277, zoom: 13, pitch: 60 },
-    'ACT-IV': {longitude: 73.97, latitude: 18.277, zoom: 13, pitch: 60 },
-    'ACT-V': {longitude: 73.97, latitude: 18.277, zoom: 13, pitch: 60 },
-    'ACT-VII': {longitude: 73.97, latitude: 18.277, zoom: 13, pitch: 60 },
-    'ACT-IX': {longitude: 73.97, latitude: 18.277, zoom: 5, pitch: 20 },
-  };
+// ── Camera configs ─────────────────────────────────────────────────────────
+const viewConfigs = {
+  'OVERVIEW_MAP':         { longitude: 76.0,  latitude: 22.0,   zoom: 5,  pitch: 0  },
+  'INTERACTIVE_PROGRESS': { longitude: 73.9,  latitude: 18.2,   zoom: 12, pitch: 45 },
+  'ACT II':                { longitude: 73.9,  latitude: 18.2,   zoom: 7,  pitch: 30 },
+  'ACT III':              { longitude: 73.9,  latitude: 18.2,   zoom: 7,  pitch: 30 },
+  'ACT-II':               { longitude: 73.9,  latitude: 18.7,   zoom: 6,  pitch: 45 },
+  'ACT IV':              { longitude: 73.97, latitude: 18.277, zoom: 13, pitch: 60 },
+  'ACT V':               { longitude: 73.97, latitude: 18.277, zoom: 13, pitch: 60 },
+  'ACT VI':                { longitude: 73.97, latitude: 18.277, zoom: 13, pitch: 20 },
+  'ACT-VII':              { longitude: 73.97, latitude: 18.277, zoom: 13, pitch: 60 },
+  'ACT-IX':               { longitude: 73.97, latitude: 18.277, zoom: 5,  pitch: 20 },
+  'ACT XI':                { longitude: 73.9,  latitude: 18.2,   zoom: 7,  pitch: 30 },
+  'ACT XIII':              { longitude: 78.02108,  latitude: 27.17952,   zoom: 16,  pitch: 30 },
+  'ACT XIV':              { longitude: 75.021111,  latitude: 21.079533,   zoom: 5,  pitch: 30 },
+  'ACT XV':              { longitude: 78.02108,  latitude: 27.17952,   zoom: 5,  pitch: 30 },  
+};
 
-  // 2. Update the Camera (View State)
+// ── Main export ────────────────────────────────────────────────────────────
+export function renderMapScene(sceneId, currentTime) {
+  if (deckgl) {
+    deckgl.finalize(); // cleanly destroys the WebGL context
+    deckgl = null;
+  }
+  initDeck(); // attaches fresh to the new #map_container
+  // If deckgl doesn't exist yet, initialize it now (DOM must be ready)
+  if (!deckgl) {
+    const ok = initDeck();
+    if (!ok) return; // container still not in DOM — bail
+  }
+
+  // Move camera
   if (viewConfigs[sceneId]) {
     deckgl.setProps({
       viewState: {
         ...viewConfigs[sceneId],
-        transitionDuration: 2000,
+        transitionDuration:    2000,
         transitionInterpolator: new deck.FlyToInterpolator()
       }
     });
   }
 
-  // 3. Update the Layers using your external library
+  // Update layers
   const activeLayers = getLayers(sceneId, currentTime);
-  console.log(activeLayers)
-  
-  deckgl.setProps({
-    layers: activeLayers
-  });
+  console.log('[map_script] layers for', sceneId, activeLayers);
+  deckgl.setProps({ layers: activeLayers });
 }
 
+// ── Time helpers ───────────────────────────────────────────────────────────
+function advanceTime() {
+  State.currentTime = Math.min(State.currentTime + 10, State.maxTime);
+  console.log(`Current Campaign Day: ${State.currentTime}`);
+  renderMapScene(State.activeScene, State.currentTime);
+}
 
-// expose functions
 window.advanceTime = advanceTime;
-
-const current_scene_id = "ACT-XII"; 
-renderScene(current_scene_id, State.currentTime);
-
