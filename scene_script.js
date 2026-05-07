@@ -1,5 +1,5 @@
 import { SCENES } from "./scene_desc.js";
-
+import { renderMapScene } from "./map_script_dynamic.js";
 // ADDED: resume bg audio if user allowed it on landing page
 if (sessionStorage.getItem('audioUnlocked') === 'true') {
   const a = document.getElementById('bg-audio');
@@ -213,10 +213,12 @@ function updateHeader() {
 }
 
 function renderScene(scene) {
+  // ── Audio ──────────────────────────────────────────────
   stopSceneAudio();
   if (scene.audio) startSceneAudio(scene.audio);
   preloadSceneAudio(currentScene + 1);
 
+  // ── Stage reset ────────────────────────────────────────
   const stage = document.getElementById('stage');
   stage.innerHTML = '';
   document.getElementById('footer-meta').textContent = scene.footer || '';
@@ -226,23 +228,39 @@ function renderScene(scene) {
   narrationStep = 0;
   clearTimeout(narrationTimer);
 
-  // ADDED: Preload media for next scene in background
+  // ── Preload next scene media in background ─────────────
   preloadMedia(currentScene + 1);
 
-  // MODIFIED: outer wrap now uses scene-layout for two-column support
+  // ── Outer two-column wrapper ───────────────────────────
   const wrap = document.createElement('div');
   wrap.className = 'scene-enter scene-layout';
 
-  // ADDED: left media panel (if scene has media)
-  if (scene.media) {
-    // Ensure current scene is preloaded (in case of direct jump)
+  // ── Left panel ─────────────────────────────────────────
+  // scene.deckMap = true  → render empty panel with #map_container for Deck.gl
+  // scene.media           → use preloaded image/Leaflet cache
+  // neither               → render empty placeholder panel
+  const needsMap = !!scene.deckMap;
+
+  if (needsMap) {
+    const mapPanel = document.createElement('div');
+    mapPanel.className = 'media-panel media-panel-empty media-panel-visible';
+    const mapDiv = document.createElement('div');
+    mapDiv.id = 'map_container';
+    mapDiv.className = 'mapHolder';
+    mapPanel.appendChild(mapDiv);
+    wrap.appendChild(mapPanel);
+  } else if (scene.media) {
     if (!mediaCache[currentScene]) preloadMedia(currentScene);
     mountMediaPanel(currentScene, wrap);
+  } else {
+    const emptyPanel = document.createElement('div');
+    emptyPanel.className = 'media-panel media-panel-empty media-panel-visible';
+    wrap.appendChild(emptyPanel);
   }
 
-  // Right content panel
+  // ── Right content panel ────────────────────────────────
   const contentPanel = document.createElement('div');
-  contentPanel.className = scene.media ? 'content-panel' : 'content-panel content-panel-full';
+  contentPanel.className = 'content-panel';
 
   if (scene.type === 'decision') {
     contentPanel.appendChild(buildDecisionScene(scene));
@@ -254,10 +272,21 @@ function renderScene(scene) {
     wrap.appendChild(contentPanel);
     stage.appendChild(wrap);
     start();
-    return;
   }
 
-  stage.appendChild(wrap);
+  // ── Mount Deck.gl after two rAF ticks (guarantees DOM paint) ──
+  if (needsMap) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const container = document.getElementById('map_container');
+        if (container) {
+          renderMapScene(scene.act, 10);
+        } else {
+          console.error('[renderScene] #map_container not found for scene:', scene.act);
+        }
+      });
+    });
+  }
 }
 
 /* ── DECISION RENDERER ── */
